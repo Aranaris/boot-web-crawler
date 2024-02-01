@@ -12,7 +12,7 @@ function normalizeURL(inputURL) {
 
 function retrieveURLs(htmlBody) {
 	const dom = new JSDOM(htmlBody)
-	retrieved = dom.window.document.querySelectorAll('a')
+	const retrieved = dom.window.document.querySelectorAll('a')
 	const urls = []
 	for (let anchor of retrieved) {
 		urls.push(anchor.href)
@@ -21,11 +21,15 @@ function retrieveURLs(htmlBody) {
 }
 
 function getURLsFromHTML(htmlBody, baseURL) {
-	bodyURLs = retrieveURLs(htmlBody)
-	urls = []
+	const bodyURLs = retrieveURLs(htmlBody)
+	const urls = []
 	for (let url of bodyURLs) {
 		if (url[0] === '/') {
-			urls.push(baseURL + url)
+			if (baseURL.slice(-1) === '/') {
+				urls.push(baseURL.slice(0, -1) + url)
+			} else {
+				urls.push(baseURL + url)
+			}
 		} else {
 			urls.push(url)
 		}
@@ -51,20 +55,25 @@ async function crawlPage(baseURL, currentURL, pages) {
 	} else {
 		pages[normalized] = 1
 	}
-	
 
 	try {
 		const response = await fetch(currentURL)
+		let nextPages = []
 		if (response.status >= 400) {
-			console.log(`Error: status code ${response.status}`)
+			console.log(`Error: status code ${response.status} for ${currentURL}`)
 		} else if (!response.headers.get('content-type').includes('text/html')) {
-			console.log('Error: content type must be text/html ')
+			console.log(`Error: content type not text/html for ${currentURL}`)
 		} else {
-			data = await response.text()
-			console.log(data)
+			const data = await response.text()
+			nextPages = getURLsFromHTML(data, baseURL)
+			console.log(`checking urls on ${currentURL}...`)
+			for (const page of nextPages) {
+				await crawlPage(baseURL, page, pages)
+			}
 		}
-	} catch {
-		console.log('error')
+		return pages
+	} catch (err) {
+		console.log(err.message)
 	}
 }
 

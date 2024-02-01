@@ -10,7 +10,7 @@ test('converts url to blog.boot.dev/path', () => {
 
 test('retrieves URLs from a given document body and origin url', () => {
 	testBody = '<html><a href="https://www.google.com/"></a><a href="/asdf"></a></html>'
-	baseURL = 'https://www.google.com'
+	baseURL = 'https://www.google.com/'
 	expect(crawl.getURLsFromHTML(testBody, baseURL)).toEqual(['https://www.google.com/', 'https://www.google.com/asdf'])
 })
 
@@ -30,7 +30,3 @@ test('checks crawlPage returns incremented pages when currentURL is already in p
 	expected_pages = { 'wagslane.dev/': 2 }
 	expect(result).toEqual(expected_pages)
 })
-// test('checks crawlPage function for error response and valid content', async () => {
-// 	baseURL = 'https://www.wagslane.dev'
-// 	data = crawl.crawlPage(baseURL)
-// })
