@@ -1,0 +1,43 @@
+env:
+  es2022: true
+  node: true
+ignorePatterns:
+  - js/
+overrides:
+  - files: ["*.mts"]
+    parserOptions:
+      sourceType: module
+extends:
+  - eslint:recommended
+rules:
+  comma-dangle:
+    - error
+    - always-multiline
+  eol-last:
+    - error
+    - always
+  indent:
+    - error
+    - tab
+  linebreak-style:
+    - error
+    - unix
+  no-trailing-spaces:
+    - error
+  object-curly-spacing:
+    - error
+    - never
+  prefer-const:
+    - error
+    - destructuring: all
+  quotes:
+    - error
+    - single
+  quote-props:
+    - error
+  jsx-quotes:
+    - error
+    - prefer-single
+  semi:
+    - error
+    - always

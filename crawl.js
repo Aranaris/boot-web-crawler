@@ -1,79 +1,79 @@
-const { JSDOM } = require('jsdom')
+const {JSDOM} = require('jsdom');
 
 function normalizeURL(inputURL) {
-	let normalized = inputURL
+	let normalized = inputURL;
 	if (inputURL.slice(-1) != '/') {
-		normalized = normalized + '/'
+		normalized = normalized + '/';
 	}
-	let urlObject = new URL(normalized)
-	
-	return urlObject.hostname + urlObject.pathname
+	const urlObject = new URL(normalized);
+
+	return urlObject.hostname + urlObject.pathname;
 }
 
 function retrieveURLs(htmlBody) {
-	const dom = new JSDOM(htmlBody)
-	const retrieved = dom.window.document.querySelectorAll('a')
-	const urls = []
-	for (let anchor of retrieved) {
-		urls.push(anchor.href)
+	const dom = new JSDOM(htmlBody);
+	const retrieved = dom.window.document.querySelectorAll('a');
+	const urls = [];
+	for (const anchor of retrieved) {
+		urls.push(anchor.href);
 	}
-	return urls
+	return urls;
 }
 
 function getURLsFromHTML(htmlBody, baseURL) {
-	const bodyURLs = retrieveURLs(htmlBody)
-	const urls = []
-	for (let url of bodyURLs) {
+	const bodyURLs = retrieveURLs(htmlBody);
+	const urls = [];
+	for (const url of bodyURLs) {
 		if (url[0] === '/') {
 			if (baseURL.slice(-1) === '/') {
-				urls.push(baseURL.slice(0, -1) + url)
+				urls.push(baseURL.slice(0, -1) + url);
 			} else {
-				urls.push(baseURL + url)
+				urls.push(baseURL + url);
 			}
 		} else {
-			urls.push(url)
+			urls.push(url);
 		}
 	}
-	return urls
+	return urls;
 }
 
 async function crawlPage(baseURL, currentURL, pages) {
 
 	if (new URL(baseURL).hostname != new URL(currentURL).hostname) {
-		return pages
+		return pages;
 	}
 
-	let normalized = normalizeURL(currentURL)
+	const normalized = normalizeURL(currentURL);
 
 	if (normalized in pages) {
-		pages[normalized]++
-		return pages
+		pages[normalized]++;
+		return pages;
 	}
 
 	if (baseURL === currentURL) {
-		pages[normalized] = 0
+		pages[normalized] = 0;
 	} else {
-		pages[normalized] = 1
+		pages[normalized] = 1;
 	}
 
 	try {
-		const response = await fetch(currentURL)
-		let nextPages = []
+		const response = await fetch(currentURL);
+		let nextPages = [];
 		if (response.status >= 400) {
-			console.log(`Error: status code ${response.status} for ${currentURL}`)
+			console.log(`Error: status code ${response.status} for ${currentURL}`);
 		} else if (!response.headers.get('content-type').includes('text/html')) {
-			console.log(`Error: content type not text/html for ${currentURL}`)
+			console.log(`Error: content type not text/html for ${currentURL}`);
 		} else {
-			const data = await response.text()
-			nextPages = getURLsFromHTML(data, baseURL)
-			console.log(`checking urls on ${currentURL}...`)
+			const data = await response.text();
+			nextPages = getURLsFromHTML(data, baseURL);
+			console.log(`checking urls on ${currentURL}...`);
 			for (const page of nextPages) {
-				await crawlPage(baseURL, page, pages)
+				await crawlPage(baseURL, page, pages);
 			}
 		}
-		return pages
+		return pages;
 	} catch (err) {
-		console.log(err.message)
+		console.log(err.message);
 	}
 }
 
@@ -81,6 +81,6 @@ module.exports = {
 	normalizeURL,
 	retrieveURLs,
 	getURLsFromHTML,
-	crawlPage
-}
+	crawlPage,
+};
 
