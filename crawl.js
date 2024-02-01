@@ -1,18 +1,13 @@
 const { JSDOM } = require('jsdom')
 
-function normalizeURL(url) {
-	let normalized = url
-	if (url.slice(0,8) === 'https://') {
-		normalized = url.slice(8)
-	} else if (url.slice(0,7) === 'http://') {
-		normalized = url.slice(7)
+function normalizeURL(inputURL) {
+	let normalized = inputURL
+	if (inputURL.slice(-1) != '/') {
+		normalized = normalized + '/'
 	}
-
-	if (url.slice(-1) == '/') {
-		normalized = normalized.slice(0, -1)
-	}
-
-	return normalized
+	let urlObject = new URL(normalized)
+	
+	return urlObject.hostname + urlObject.pathname
 }
 
 function retrieveURLs(htmlBody) {
@@ -38,7 +33,26 @@ function getURLsFromHTML(htmlBody, baseURL) {
 	return urls
 }
 
-async function crawlPage(currentURL) {
+async function crawlPage(baseURL, currentURL, pages) {
+
+	if (new URL(baseURL).hostname != new URL(currentURL).hostname) {
+		return pages
+	}
+
+	let normalized = normalizeURL(currentURL)
+
+	if (normalized in pages) {
+		pages[normalized]++
+		return pages
+	}
+
+	if (baseURL === currentURL) {
+		pages[normalized] = 0
+	} else {
+		pages[normalized] = 1
+	}
+	
+
 	try {
 		const response = await fetch(currentURL)
 		if (response.status >= 400) {
