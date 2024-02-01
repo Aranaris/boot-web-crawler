@@ -13,3 +13,8 @@ test('retrieves URLs from a given document body and origin url', () => {
 	baseURL = 'https://www.google.com'
 	expect(crawl.getURLsFromHTML(testBody, baseURL)).toEqual(['https://www.google.com/', 'https://www.google.com/asdf'])
 })
+
+test('checks crawlPage function for error response and valid content', async () => {
+	baseURL = 'https://wagslane.dev'
+	data = crawl.crawlPage(baseURL)
+})
