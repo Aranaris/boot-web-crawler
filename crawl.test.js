@@ -1,4 +1,5 @@
 const crawl = require('./crawl');
+const report = require('./report');
 const {test, expect} = require('@jest/globals');
 
 test('converts url to blog.boot.dev/path', () => {
@@ -29,4 +30,10 @@ test('checks crawlPage returns incremented pages when currentURL is already in p
 	const result = await crawl.crawlPage(baseURL, currentURL, pages);
 	const expected_pages = {'wagslane.dev/': 2};
 	expect(result).toEqual(expected_pages);
+});
+
+test('checks sortPages returns result sorted in descending order', () => {
+	const input = {'b': 3, 'c': 1, 'a': 5};
+	const expected_pages = [{'a': 5}, {'b': 3}, {'c': 1}];
+	expect(report.sortPages(input)).toStrictEqual(expected_pages);
 });
