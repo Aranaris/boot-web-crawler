@@ -34,6 +34,6 @@ test('checks crawlPage returns incremented pages when currentURL is already in p
 
 test('checks sortPages returns result sorted in descending order', () => {
 	const input = {'b': 3, 'c': 1, 'a': 5};
-	const expected_pages = [{'a': 5}, {'b': 3}, {'c': 1}];
+	const expected_pages = ['a', 'b', 'c'];
 	expect(report.sortPages(input)).toStrictEqual(expected_pages);
 });
